@@ -1,13 +1,10 @@
 import { Bot, InlineKeyboard, InputFile } from "grammy";
-import puppeteer from "puppeteer-core";
+import puppeteer from "puppeteer";
 import { readFileSync, unlinkSync, existsSync } from "fs";
-import { execSync } from "child_process";
-import "dotenv/config"
+import "dotenv/config";
 
-const BOT_TOKEN =process.env.BOT_TOKEN;
-const ADMIN_ID=process.env.ADMIN_ID
-
-
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const ADMIN_ID = process.env.ADMIN_ID;
 
 const bot = new Bot(BOT_TOKEN);
 const userChoices = new Map();
@@ -21,36 +18,15 @@ let browserInstance = null;
 
 const getBrowser = async () => {
   if (!browserInstance) {
-    try {
-      let chromePath;
-      try {
-        chromePath = execSync("where chrome").toString().trim().split("\n")[0];
-      } catch {
-        try {
-          chromePath =
-            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
-          if (!existsSync(chromePath)) {
-            chromePath =
-              "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
-          }
-        } catch {
-          throw new Error("Chrome topilmadi");
-        }
-      }
-      browserInstance = await puppeteer.launch({
-        executablePath: chromePath,
-        headless: true,
-        args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-dev-shm-usage",
-          "--disable-gpu",
-        ],
-      });
-    } catch (error) {
-      console.error("Browser launch error:", error);
-      throw error;
-    }
+    browserInstance = await puppeteer.launch({
+      headless: true,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+      ],
+    });
   }
   return browserInstance;
 };

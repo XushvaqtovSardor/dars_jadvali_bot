@@ -2,7 +2,7 @@
   "name": "tsue-timetable-bot",
   "version": "1.0.0",
   "type": "module",
-  "main": "bot.js",
+  "main": "src/bot.js",
   "scripts": {
     "start": "node  src/bot.js",
     "start:dev": "node --watch src/bot.js"
@@ -10,7 +10,6 @@
   "dependencies": {
     "dotenv": "^17.2.3",
     "grammy": "^1.21.1",
-    "puppeteer": "^24.15.0",
-    "puppeteer-core": "^24.30.0"
+    "puppeteer": "^24.15.0"
   }
 }
