@@ -1,4 +1,4 @@
-import { Bot, InlineKeyboard, InputFile } from "grammy";
+import { Bot, InlineKeyboard, InputFile, Keyboard } from "grammy";
 import puppeteer from "puppeteer";
 import { readFileSync, unlinkSync, existsSync } from "fs";
 import "dotenv/config";
@@ -94,13 +94,26 @@ bot.command("start", async (ctx) => {
     keyboard.text(fak, `fak_${fak}`).row();
   });
 
-  await ctx.reply("📚 Fakultetni tanlang:", { reply_markup: keyboard });
+  const menuKeyboard = new Keyboard().text("Меню").resized();
+
+  await ctx.reply("📚 Fakultetni tanlang:", { 
+    reply_markup: keyboard 
+  });
 
   if (!userChoices.has(ctx.from.id)) {
     userChoices.set(ctx.from.id, {
       name: ctx.from.first_name + (ctx.from.last_name || ""),
     });
   }
+});
+
+bot.hears("Меню", async (ctx) => {
+  const keyboard = new InlineKeyboard();
+  Object.keys(jadvalLinks).forEach((fak) => {
+    keyboard.text(fak, `fak_${fak}`).row();
+  });
+
+  await ctx.reply("📚 Fakultetni tanlang:", { reply_markup: keyboard });
 });
 
 bot.callbackQuery(/^fak_/, async (ctx) => {
@@ -143,16 +156,12 @@ bot.callbackQuery(/^group_/, async (ctx) => {
 
   userChoices.set(ctx.from.id, { fak, kurs, guruh, name: ctx.from.first_name });
 
-  const loadingMsg = await ctx.reply(
-    "⏳ Jadval yuklanmoqda, iltimos kutib turing..."
-  );
+  try {
+    await ctx.deleteMessage();
+  } catch (e) {}
 
   const link = jadvalLinks[fak][kurs][guruh];
   const screenshotPath = await getJadvalScreenshot(link);
-
-  try {
-    await ctx.api.deleteMessage(ctx.chat.id, loadingMsg.message_id);
-  } catch (e) {}
 
   if (screenshotPath) {
     const keyboard = new InlineKeyboard()
@@ -195,17 +204,17 @@ bot.callbackQuery("update_jadval", async (ctx) => {
   const choice = userChoices.get(userId);
 
   if (choice && choice.fak && choice.kurs && choice.guruh) {
+    if (lastMessageId.has(userId)) {
+      try {
+        await ctx.api.deleteMessage(ctx.chat.id, lastMessageId.get(userId));
+      } catch (e) {}
+    }
+
     const { fak, kurs, guruh } = choice;
     const link = jadvalLinks[fak][kurs][guruh];
     const screenshotPath = await getJadvalScreenshot(link);
 
     if (screenshotPath) {
-      if (lastMessageId.has(userId)) {
-        try {
-          await ctx.api.deleteMessage(ctx.chat.id, lastMessageId.get(userId));
-        } catch (e) {}
-      }
-
       const currentTime = new Date().toLocaleString("uz-UZ", {
         timeZone: "Asia/Tashkent",
       });
