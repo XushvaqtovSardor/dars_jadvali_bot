@@ -36,7 +36,11 @@ const getJadvalScreenshot = async (url) => {
   try {
     const browser = await getBrowser();
     page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 1 });
+    await page.setViewport({
+      width: 1920,
+      height: 1080,
+      deviceScaleFactor: 2,
+    });
 
     await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
 
@@ -96,8 +100,8 @@ bot.command("start", async (ctx) => {
 
   const menuKeyboard = new Keyboard().text("Меню").resized();
 
-  await ctx.reply("📚 Fakultetni tanlang:", { 
-    reply_markup: keyboard 
+  await ctx.reply("📚 Fakultetni tanlang:", {
+    reply_markup: keyboard,
   });
 
   if (!userChoices.has(ctx.from.id)) {
