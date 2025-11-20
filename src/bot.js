@@ -36,7 +36,8 @@ const getJadvalScreenshot = async (url) => {
   try {
     const browser = await getBrowser();
     page = await browser.newPage();
-    await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 2 });
+    await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 1 });
+
     await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
 
     await page.evaluate(() => {
